@@ -17,38 +17,11 @@ public class Cliente {
 			Socket s = new Socket(HOST, PUERTO);
 			System.out.println("Conectado al servidor");
 			
-			DataInputStream entrada = new DataInputStream(s.getInputStream());
-			DataOutputStream salida = new DataOutputStream(s.getOutputStream());
+			EmisorThread emisor = new EmisorThread(s);
+			ReceptorThread receptor = new ReceptorThread(s);
 			
-			Thread recibir = new Thread(() -> {
-				try {
-					String mensaje;
-					
-					while(true) {
-						mensaje = entrada.readUTF();
-						System.out.println("Servidor: " + mensaje);
-					}
-					
-				}catch(IOException ioe) {
-					System.out.println("Conexión cerrada.");
-				}
-			});
-			
-			Thread enviar = new Thread(() -> {
-				Scanner teclado = new Scanner(System.in);
-				
-				while(true) {
-					String mensaje = teclado.nextLine();
-					try {
-						salida.writeUTF(mensaje);
-					} catch (IOException e) {
-						System.out.println("Error al enviar el mensaje.");
-					}
-				}
-			});
-			
-			recibir.start();
-			enviar.start();
+			emisor.start();
+			receptor.start();
 			
 		}catch(Exception e) {
 			e.printStackTrace();
